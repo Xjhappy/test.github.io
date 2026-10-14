@@ -1,0 +1,104 @@
+{
+  "source_pdf": "参考资料/HI用户手册-应用篇-中文版V1.2.pdf",
+  "product": "DHVECTOL-HI系列高压变频器",
+  "purpose": "用于LLM决策辅助的证据约束，不替代保护逻辑、故障代码、厂家流程或现场授权人员判断。",
+  "safety_constraints": [
+    {
+      "section": "2.2.2",
+      "rule": "只有具备专业电工或专业资格并熟悉高压变频系统、用户手册和适用标准的人员才能操作设备。"
+    },
+    {
+      "section": "2.2.6-2.2.7",
+      "rule": "带电测量必须做好防护并有陪同人员；测量设备的量程、连接和使用必须符合现场要求。"
+    },
+    {
+      "section": "2.2.11",
+      "rule": "设备退出运行后，维护或检修前至少等待20分钟，并确认不会意外重新上电、直流侧和交流侧已无电，执行必要的接地和短路。"
+    },
+    {
+      "section": "2.2.13",
+      "rule": "维护检修应至少两名人员在现场；设备安全断电和放电完成前不得执行维护操作。"
+    }
+  ],
+  "fault_handling_principles": [
+    {
+      "section": "9.1",
+      "rule": "故障处理需要兼顾恢复运行优先和故障定位；即使复位后能够重启，也必须继续进行故障定位和必要测量。"
+    },
+    {
+      "section": "9.2.3-9.2.4",
+      "rule": "重故障、轻故障和报警应区分；重故障因素按发生顺序显示。故障因素60ms内的事件可视为同一时间区域，顺序证据应来自保护/触摸屏记录。"
+    },
+    {
+      "section": "8.2.3",
+      "rule": "故障画面用于查看故障因素；单元故障、启动失败、冷却风机、柜内过热等应进入对应详情页面定位。"
+    },
+    {
+      "section": "8.2.4、9.2.8",
+      "rule": "联锁不是单一故障结论，应检查重故障、主回路断路器、轻故障、预充电电源、连接器、运行联锁、急停和测试模式等因素。"
+    }
+  ],
+  "fault_catalog": [
+    {
+      "name": "启动失败",
+      "mechanism": "启动过程未完成或启动条件不满足",
+      "evidence_channels": ["Speed Ref", "Estimated Velocity", "U Phase Current FB", "W Phase Current FB", "Overload Inhibition"]
+    },
+    {
+      "name": "过流",
+      "mechanism": "电流超过电机最大额定电流，可能由软件或硬件检测触发",
+      "evidence_channels": ["U Phase Current FB", "W Phase Current FB", "Torque Current FB", "Estimated Velocity"]
+    },
+    {
+      "name": "过压",
+      "mechanism": "电机电压超过过电压水平",
+      "evidence_channels": ["U Phase Voltage Ref", "V Phase Voltage Ref", "W Phase Voltage Ref", "Primary Voltage FB", "Receiving Voltage FB"]
+    },
+    {
+      "name": "过载",
+      "mechanism": "电流超过电机额定负载并持续达到时限",
+      "evidence_channels": ["Torque Current FB", "U Phase Current FB", "W Phase Current FB", "Overload Inhibition"]
+    },
+    {
+      "name": "接地",
+      "mechanism": "三相输出中一相接地",
+      "evidence_channels": ["Ground Voltage", "U Phase Current FB", "W Phase Current FB", "Receiving Voltage FB"]
+    },
+    {
+      "name": "单元柜冷却风机停止",
+      "mechanism": "变频器运行中冷却风机停止",
+      "evidence_channels": ["Ground Voltage", "Receiving Voltage FB", "Torque Current FB"]
+    },
+    {
+      "name": "柜内过热/变压器过热",
+      "mechanism": "温度检测动作或变压器绕组温度过高",
+      "evidence_channels": ["Torque Current FB", "Overload Inhibition", "U Phase Current FB", "W Phase Current FB"]
+    },
+    {
+      "name": "U/V/W相单元故障",
+      "mechanism": "对应相变频单元发生故障",
+      "evidence_channels": ["U Phase Voltage Ref", "V Phase Voltage Ref", "W Phase Voltage Ref", "Receiving Voltage FB"]
+    },
+    {
+      "name": "串行信号消失",
+      "mechanism": "对应相光纤串行通信异常",
+      "evidence_channels": ["U Phase Voltage FB", "W Phase Voltage FB", "Voltage Control Rate"]
+    }
+  ],
+  "decision_output_schema": {
+    "decision_level": "stable | attention | high_risk | insufficient_evidence",
+    "conclusion": "一句话结论，必须明确是预测性建议还是已确认故障。",
+    "evidence": "至少3条，包含指标、时间、来源和解释。",
+    "recommended_actions": "按优先级排序的人工复核建议，不得包含未经授权的高压操作指令。",
+    "missing_evidence": "需要人工补充的故障代码、联锁、保护动作顺序或现场测量。",
+    "human_confirmation": "必须由授权人员确认的事项。",
+    "manual_basis": "引用手册章节和规则。"
+  },
+  "forbidden_outputs": [
+    "不能把综合风险分直接表述为厂家故障代码或最终故障结论。",
+    "不能建议非授权人员带电开柜、带电触摸、拆线、短接或绕过联锁。",
+    "不能仅凭预测曲线直接决定复位、重启、停机或改变保护定值。",
+    "不能把生成数据或预测数据描述为现场已发生的事实。",
+    "不能省略数据来源、当前时间窗口、模型状态和不确定性。"
+  ]
+}
